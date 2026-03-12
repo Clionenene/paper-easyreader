@@ -39,3 +39,25 @@ lib/
 - `lib/papers.ts` のデータ取得を arXiv API 呼び出しへ差し替え
 - スワイプジェスチャー（`Next`）の追加
 - Like済みデータにメモやタグを付ける
+
+
+## npm install がタイムアウトする場合
+
+ネットワーク状況により `npm ERR! code ERR_SOCKET_TIMEOUT` が出ることがあります。
+このリポジトリには `.npmrc` で以下を設定済みです。
+
+- `fetch-timeout=300000`
+- `fetch-retries=5`
+- `fetch-retry-mintimeout=20000`
+- `fetch-retry-maxtimeout=120000`
+- `registry=https://registry.npmjs.org/`
+
+それでも失敗する場合は、次を試してください。
+
+```bash
+npm cache clean --force
+npm install --prefer-online
+```
+
+プロキシ配下の場合は `npm config get proxy` / `npm config get https-proxy` を確認し、
+必要に応じて適切な値を設定してください。
