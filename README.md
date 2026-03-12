@@ -1,6 +1,7 @@
 # Paper EasyReader
 
-TikTokのように論文を1件ずつ流し読みして、気になった論文をLike保存できるミニマルなMVPです。
+TikTokのように論文を1件ずつ流し読みしつつ、
+「一行要約 + メモ + 復習」で理解を積み上げるためのミニマルWebアプリです。
 
 ## セットアップ
 
@@ -15,35 +16,35 @@ npm run dev
 
 - ホーム画面で論文カード（Title / Abstract / Link）を1件ずつ表示
 - キーワード入力 + `Fetch` で arXiv API から論文を自動収集
-- `Next` ボタンで次の論文へ
-- `Like` ボタンまたはカードのダブルタップでLike保存
-- Liked画面で保存済み論文の一覧表示と削除
-- Like状態は `localStorage` で永続化（論文データごと保存）
+- `Like` ボタンまたはカードのダブルタップで保存
+- Like論文ごとに **一行要約** と **自由メモ** を保存（localStorage）
+- 復習スケジュール（1日後 / 3日後 / 7日後）で復習対象を優先表示
+- 復習中は「前回の要約/メモ」を先に表示し、`復習した` で次回へ進める
+- 効果音/アニメーションの ON/OFF 設定（localStorage）
+- Like時ハート演出、カード遷移の軽いアニメーション、メモ保存チェック表示
 
 ## ファイル構成
 
 ```txt
 app/
-  layout.tsx       # 共通レイアウト（ヘッダー + ナビ）
-  page.tsx         # ホーム画面（カード表示、Next/Like操作）
-  liked/page.tsx   # Like済み論文一覧画面
-  globals.css      # Tailwind + 最小グローバルスタイル
+  api/papers/route.ts   # arXiv取得API（fallbackあり）
+  layout.tsx            # 共通レイアウト
+  page.tsx              # ホーム（閲覧/Like/復習/設定）
+  liked/page.tsx        # Like一覧（要約/メモ編集）
+  globals.css           # グローバル + 軽量アニメーション
 components/
-  PaperCard.tsx    # 論文カード
+  PaperCard.tsx         # 論文カード（復習情報/バッジ表示対応）
 lib/
-  arxiv.ts         # arXiv Atomレスポンスの取得・パース
-  papers.ts        # フォールバック論文データ
-  storage.ts       # localStorageへの保存・復元
-app/api/papers/
-  route.ts         # arXiv APIを叩くサーバーAPI
+  arxiv.ts              # arXiv Atomレスポンスの取得・パース
+  papers.ts             # Paper/LikedPaper型 + 復習ロジック + fallbackデータ
+  storage.ts            # liked data / settings のlocalStorage保存
 ```
 
-## 今後の拡張ポイント
+## 復習ロジック（MVP）
 
-- `lib/papers.ts` のデータ取得を arXiv API 呼び出しへ差し替え
-- スワイプジェスチャー（`Next`）の追加
-- Like済みデータにメモやタグを付ける
-
+- `reviewCount = 0` → 次回は1日後
+- `reviewCount = 1` → 次回は3日後
+- `reviewCount >= 2` → 次回は7日後
 
 ## npm install がタイムアウトする場合
 
@@ -56,12 +57,9 @@ app/api/papers/
 - `fetch-retry-maxtimeout=120000`
 - `registry=https://registry.npmjs.org/`
 
-それでも失敗する場合は、次を試してください。
+それでも失敗する場合は次を試してください。
 
 ```bash
 npm cache clean --force
 npm install --prefer-online
 ```
-
-プロキシ配下の場合は `npm config get proxy` / `npm config get https-proxy` を確認し、
-必要に応じて適切な値を設定してください。

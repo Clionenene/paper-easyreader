@@ -5,6 +5,46 @@ export type Paper = {
   link: string;
 };
 
+export type ReviewStage = 0 | 1 | 2;
+
+export type LikedPaper = Paper & {
+  likedAt: string;
+  note: string;
+  oneLineSummary: string;
+  reviewCount: number;
+  nextReviewAt: string;
+};
+
+const REVIEW_INTERVAL_DAYS = [1, 3, 7] as const;
+
+export const calcNextReviewAt = (reviewCount: number, from = new Date()): string => {
+  const stage = Math.min(reviewCount, REVIEW_INTERVAL_DAYS.length - 1);
+  const days = REVIEW_INTERVAL_DAYS[stage];
+  const next = new Date(from);
+  next.setDate(next.getDate() + days);
+  return next.toISOString();
+};
+
+export const createLikedPaper = (paper: Paper): LikedPaper => ({
+  ...paper,
+  likedAt: new Date().toISOString(),
+  note: '',
+  oneLineSummary: '',
+  reviewCount: 0,
+  nextReviewAt: calcNextReviewAt(0)
+});
+
+export const completeReview = (paper: LikedPaper): LikedPaper => {
+  const nextCount = paper.reviewCount + 1;
+  return {
+    ...paper,
+    reviewCount: nextCount,
+    nextReviewAt: calcNextReviewAt(nextCount)
+  };
+};
+
+export const isReviewDue = (paper: LikedPaper, now = new Date()) => new Date(paper.nextReviewAt) <= now;
+
 // Fallback data when API is unavailable.
 export const fallbackPapers: Paper[] = [
   {
