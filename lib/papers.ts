@@ -5,7 +5,8 @@ export type Paper = {
   link: string;
 };
 
-export const papers: Paper[] = [
+// Fallback data when API is unavailable.
+export const fallbackPapers: Paper[] = [
   {
     id: '2401.00001',
     title: 'Attention Is All You Need for Fast Summarization in Scientific Text',
@@ -26,12 +27,5 @@ export const papers: Paper[] = [
     abstract:
       'We learn citation-aware embeddings with contrastive objectives and show improved nearest-neighbor quality for paper discovery and ranking.',
     link: 'https://arxiv.org/abs/2403.10293'
-  },
-  {
-    id: '2404.98765',
-    title: 'TinyBench: Efficient Evaluation of LLMs on Academic Reasoning',
-    abstract:
-      'TinyBench introduces compact, high-signal reasoning tasks derived from peer-reviewed papers to evaluate model depth with low inference cost.',
-    link: 'https://arxiv.org/abs/2404.98765'
   }
 ];

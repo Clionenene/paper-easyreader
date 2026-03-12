@@ -14,10 +14,11 @@ npm run dev
 ## 主な機能
 
 - ホーム画面で論文カード（Title / Abstract / Link）を1件ずつ表示
+- キーワード入力 + `Fetch` で arXiv API から論文を自動収集
 - `Next` ボタンで次の論文へ
 - `Like` ボタンまたはカードのダブルタップでLike保存
 - Liked画面で保存済み論文の一覧表示と削除
-- Like状態は `localStorage` で永続化
+- Like状態は `localStorage` で永続化（論文データごと保存）
 
 ## ファイル構成
 
@@ -30,8 +31,11 @@ app/
 components/
   PaperCard.tsx    # 論文カード
 lib/
-  papers.ts        # ダミー論文データ
+  arxiv.ts         # arXiv Atomレスポンスの取得・パース
+  papers.ts        # フォールバック論文データ
   storage.ts       # localStorageへの保存・復元
+app/api/papers/
+  route.ts         # arXiv APIを叩くサーバーAPI
 ```
 
 ## 今後の拡張ポイント

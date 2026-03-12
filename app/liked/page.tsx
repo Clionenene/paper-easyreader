@@ -1,22 +1,17 @@
 'use client';
 
-import { useMemo, useState } from 'react';
 import Link from 'next/link';
-import { papers } from '@/lib/papers';
-import { loadLikedPaperIds, saveLikedPaperIds } from '@/lib/storage';
+import { useState } from 'react';
+import type { Paper } from '@/lib/papers';
+import { loadLikedPapers, saveLikedPapers } from '@/lib/storage';
 
 export default function LikedPage() {
-  const [likedPaperIds, setLikedPaperIds] = useState<string[]>(() => loadLikedPaperIds());
-
-  const likedPapers = useMemo(
-    () => papers.filter((paper) => likedPaperIds.includes(paper.id)),
-    [likedPaperIds]
-  );
+  const [likedPapers, setLikedPapers] = useState<Paper[]>(() => loadLikedPapers());
 
   const removeLike = (id: string) => {
-    const next = likedPaperIds.filter((likedId) => likedId !== id);
-    setLikedPaperIds(next);
-    saveLikedPaperIds(next);
+    const next = likedPapers.filter((paper) => paper.id !== id);
+    setLikedPapers(next);
+    saveLikedPapers(next);
   };
 
   return (
