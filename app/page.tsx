@@ -10,6 +10,7 @@ export default function Home() {
   const [query, setQuery] = useState('llm');
   const [papers, setPapers] = useState<Paper[]>(fallbackPapers);
   const [source, setSource] = useState<'arxiv' | 'fallback'>('fallback');
+  const [sourceReason, setSourceReason] = useState<string>('fetch_error');
   const [loading, setLoading] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [likedPapers, setLikedPapers] = useState<Paper[]>(() => loadLikedPapers());
@@ -26,13 +27,15 @@ export default function Home() {
 
     try {
       const response = await fetch(`/api/papers?query=${encodeURIComponent(nextQuery)}`);
-      const data = (await response.json()) as { papers: Paper[]; source: 'arxiv' | 'fallback' };
+      const data = (await response.json()) as { papers: Paper[]; source: 'arxiv' | 'fallback'; sourceReason?: string };
       setPapers(data.papers.length > 0 ? data.papers : fallbackPapers);
       setSource(data.source);
+      setSourceReason(data.sourceReason ?? 'ok');
       setCurrentIndex(0);
     } catch {
       setPapers(fallbackPapers);
       setSource('fallback');
+      setSourceReason('fetch_error');
       setCurrentIndex(0);
     } finally {
       setLoading(false);
@@ -55,7 +58,7 @@ export default function Home() {
   return (
     <section className="flex flex-1 flex-col gap-4">
       <div className="space-y-2 rounded-xl border border-slate-800 bg-slate-900 p-3">
-        <p className="text-xs text-slate-400">自動収集（arXiv）: {source === 'arxiv' ? 'ON' : 'Fallback data'}</p>
+        <p className="text-xs text-slate-400">自動収集（arXiv）: {source === 'arxiv' ? `ON (${sourceReason})` : `Fallback (${sourceReason})`}</p>
         <div className="flex gap-2">
           <input
             className="flex-1 rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm outline-none"

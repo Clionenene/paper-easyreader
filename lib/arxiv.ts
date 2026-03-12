@@ -11,12 +11,25 @@ const pickTag = (entry: string, tag: string) => {
   return match ? cleanText(match[1]) : '';
 };
 
-const pickLink = (entry: string) => {
-  const direct = entry.match(/<link[^>]*title="pdf"[^>]*href="([^"]+)"[^>]*\/?>(?:<\/link>)?/i);
-  if (direct?.[1]) return direct[1];
+const pickAttr = (tag: string, attr: string) => {
+  const match = tag.match(new RegExp(`${attr}="([^"]+)"`, 'i'));
+  return match?.[1] ?? '';
+};
 
-  const alternate = entry.match(/<link[^>]*rel="alternate"[^>]*href="([^"]+)"[^>]*\/?>(?:<\/link>)?/i);
-  if (alternate?.[1]) return alternate[1];
+const pickLink = (entry: string) => {
+  const linkTags = entry.match(/<link\b[^>]*>/gi) ?? [];
+
+  for (const linkTag of linkTags) {
+    const title = pickAttr(linkTag, 'title');
+    const href = pickAttr(linkTag, 'href');
+    if (title.toLowerCase() === 'pdf' && href) return href;
+  }
+
+  for (const linkTag of linkTags) {
+    const rel = pickAttr(linkTag, 'rel');
+    const href = pickAttr(linkTag, 'href');
+    if (rel.toLowerCase() === 'alternate' && href) return href;
+  }
 
   return '';
 };
